@@ -1,0 +1,55 @@
+# Byzantion deploy-image build — fork-only workflow, never sent upstream.
+#
+# Builds the repo's own Dockerfile from the byzantion-deploy branch (an
+# upstream release tag + cherry-picked patches) and pushes it to GHCR.
+# The team VM's docker-compose pulls the resulting image by tag.
+#
+# Branch model:
+#   main               — tracks upstream, no local commits
+#   feat/*             — upstream PR branches (no CI files)
+#   byzantion-deploy   — release tag + cherry-picks + this workflow
+name: build-deploy-image
+
+on:
+  push:
+    branches: [byzantion-deploy]
+    tags: ["deploy-v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/byzantion-xyz/hermes-agent
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=sha,prefix=sha-
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          # The team VM (GCP e2-standard-2) is amd64-only.
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
