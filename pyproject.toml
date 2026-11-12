@@ -38,7 +38,7 @@ dependencies = [
   # user picks that backend. Smaller `dependencies` = smaller blast
   # radius for the next supply-chain attack.
   "openai==2.24.0",
-  "certifi==2026.5.20",
+  "certifi==2026.10.19",  # GHSA-6q48-6c7w-9gw2 (drops the emSign roots with compromised intermediates)
   "python-dotenv==1.2.2",
   "fire==0.7.1",
   "httpx[socks]==0.28.1",
@@ -78,7 +78,7 @@ dependencies = [
   # it out of the lazy-install path that exists only for the heavy matrix deps.
   "Markdown==3.10.2",
   # Skills Hub (GitHub App JWT auth — optional, only needed for bot identity)
-  "PyJWT[crypto]==2.13.0",  # PYSEC-2026-175/177/178/179
+  "PyJWT[crypto]==2.15.1",  # PYSEC-2026-175/177/178/179 + GHSA-pxh4-856f-4h89 (fixed in 2.14.0)
   # urllib3 2.7.0 fixes GHSA-mf9v-mfxr-j63j (decompression-bomb bypass)
   # and GHSA-qccp-gfcp-xxvc (header leak across origins).
   "urllib3>=2.7.0,<3",
@@ -131,7 +131,7 @@ dependencies = [
   # libs required for the codecs we use, so it's safe to ship in the base
   # install rather than gating it behind an extra + a mid-session lazy install
   # (which deadlocked the CLI under prompt_toolkit — see #40490).
-  "Pillow==12.3.0",
+  "Pillow==13.0.0",
   # Windows log rotation. Stdlib ``RotatingFileHandler.doRollover()`` uses
   # ``os.rename()`` which fails with ``PermissionError [WinError 32]`` on
   # Windows whenever any other process holds an append-mode handle on
@@ -182,10 +182,10 @@ daytona = ["daytona==0.155.0"]
 vercel = ["vercel==0.7.2"]
 hindsight = ["hindsight-client==0.6.1"]
 dev = ["debugpy==1.8.20", "pytest==9.1.1", "pytest-asyncio==1.3.0", "mcp==2.0.0", "httpx2==2.7.0", "starlette==1.3.1", "ty==0.0.21", "ruff==0.15.10", "setuptools==83.0.0"]  # starlette: CVE-2026-48710; setuptools: 83 (torch >=2.13 requires setuptools 83)
-messaging = ["python-telegram-bot[webhooks]==22.8", "discord.py[voice]==2.7.1", "aiohttp==3.14.3", "brotlicffi==1.2.0.1", "slack-bolt==1.30.0", "slack-sdk==3.43.0", "qrcode==7.4.2"]  # aiohttp 3.14.3: prior CVEs + GHSA-cq5v-8q36-5273/GHSA-mfx4-hv73-q22v/GHSA-mq44-7p77-q5h7
+messaging = ["python-telegram-bot[webhooks]==22.8", "discord.py[voice]==2.7.1", "aiohttp==3.14.5", "brotlicffi==1.2.1.0", "slack-bolt==1.30.0", "slack-sdk==3.43.0", "qrcode==7.4.2"]  # aiohttp 3.14.5: prior CVEs + GHSA-cq5v-8q36-5273/GHSA-mfx4-hv73-q22v/GHSA-mq44-7p77-q5h7 + GHSA-2g87-pp6c-29x5, CVE-2026-111063/111064/111065/111066/111748/111749/111750 (fixed in 3.14.4)
 cron = []  # croniter is now a core dependency; this extra kept for back-compat
-slack = ["slack-bolt==1.30.0", "slack-sdk==3.43.0", "aiohttp==3.14.3"]
-matrix = ["mautrix[encryption]==0.21.1", "aiosqlite==0.22.1", "asyncpg==0.31.0", "aiohttp-socks==0.11.0", "aiohttp==3.14.3"]  # aiohttp 3.14.3: prior CVEs + GHSA-cq5v-8q36-5273/GHSA-mfx4-hv73-q22v/GHSA-mq44-7p77-q5h7 (mautrix/aiohttp-socks only cap aiohttp<4 / >=3.10, so pin the patched floor directly)
+slack = ["slack-bolt==1.30.0", "slack-sdk==3.43.0", "aiohttp==3.14.5"]
+matrix = ["mautrix[encryption]==0.21.1", "aiosqlite==0.22.1", "asyncpg==0.31.0", "aiohttp-socks==0.11.0", "aiohttp==3.14.5"]  # aiohttp 3.14.5: prior CVEs + GHSA-cq5v-8q36-5273/GHSA-mfx4-hv73-q22v/GHSA-mq44-7p77-q5h7 + GHSA-2g87-pp6c-29x5, CVE-2026-111063/111064/111065/111066/111748/111749/111750 (fixed in 3.14.4) (mautrix/aiohttp-socks only cap aiohttp<4 / >=3.10, so pin the patched floor directly)
 # WeCom callback-mode adapter — parses untrusted XML POST bodies from
 # WeCom-controlled callback endpoints, so we use defusedxml (drop-in
 # replacement for stdlib xml.etree.ElementTree) to block billion-laughs
@@ -257,9 +257,9 @@ mcp = ["mcp==2.0.0", "httpx2==2.7.0", "starlette==1.3.1"]  # starlette: CVE-2026
 # Backwards-compatible no-op alias. Relay is a core dependency on supported
 # wheel targets and intentionally unavailable on other platforms.
 nemo-relay = []
-homeassistant = ["aiohttp==3.14.3"]
-sms = ["aiohttp==3.14.3"]
-teams = ["microsoft-teams-apps==2.0.13.4", "aiohttp==3.14.3"]  # aiohttp 3.14.3: prior CVEs + GHSA-cq5v-8q36-5273/GHSA-mfx4-hv73-q22v/GHSA-mq44-7p77-q5h7
+homeassistant = ["aiohttp==3.14.5"]
+sms = ["aiohttp==3.14.5"]
+teams = ["microsoft-teams-apps==2.0.13.4", "aiohttp==3.14.5"]  # aiohttp 3.14.5: prior CVEs + GHSA-cq5v-8q36-5273/GHSA-mfx4-hv73-q22v/GHSA-mq44-7p77-q5h7 + GHSA-2g87-pp6c-29x5, CVE-2026-111063/111064/111065/111066/111748/111749/111750 (fixed in 3.14.4)
 # Computer use — macOS background desktop control via cua-driver (MCP stdio).
 # The cua-driver binary itself is installed via `hermes tools` post-setup
 # (curl install script); this extra just pins the MCP client used to talk
@@ -414,7 +414,14 @@ exclude-newer = "14 days"
 # cutoff can still brick installs. Exempting exact pins is pure brick-risk
 # removal at no supply-chain cost. Guarded by
 # tests/test_packaging_metadata.py::test_build_system_requires_exempt_from_exclude_newer.
-exclude-newer-package = { vercel = false, nemo-relay = false, huggingface_hub = false, h2 = false, aiohttp = false, cryptography = false, defusedxml = false, python-olm = false, unpaddedbase64 = false, setuptools = false, pillow = false, mcp = false }
+#
+# brotlicffi, certifi, pyjwt, oauthlib, msgpack, filelock: Byzantion CVE sweep
+# 2026-10-30. Same shape as h2/aiohttp: the advisory fixes (brotlicffi
+# CVE-2026-111497 on the CISA KEV list, certifi GHSA-6q48-6c7w-9gw2, pyjwt
+# GHSA-pxh4-856f-4h89, oauthlib CVE-2026-49272, msgpack CVE-2026-114613,
+# filelock CVE-2026-112940) are newer than the 14-day window. Remove after
+# 2026-11-20.
+exclude-newer-package = { vercel = false, nemo-relay = false, huggingface_hub = false, h2 = false, aiohttp = false, cryptography = false, defusedxml = false, python-olm = false, unpaddedbase64 = false, setuptools = false, pillow = false, mcp = false, brotlicffi = false, certifi = false, pyjwt = false, oauthlib = false, msgpack = false, filelock = false }
 
 [tool.setuptools]
 # Top-level single-file modules (not packages). Without this, uv2nix's
